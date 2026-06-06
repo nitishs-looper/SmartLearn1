@@ -89,9 +89,9 @@ class Program
             case "Student":
                 showstudentdashboard(); break;
             case "Instructor":
-                Console.WriteLine("Instructor Dashboard coming soon!"); break;
+                showinstructordashboard(); break;
             case "Admin":
-                Console.WriteLine("Admin Dashboard coming soon!"); break;
+                showadmindashboard(); break;
             default:
                 Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin."); break;
         }
@@ -233,7 +233,6 @@ class Program
         Console.WriteLine("5.Logout");
         Console.WriteLine("Enter your options:");
         string option = Console.ReadLine();
-        Console.Clear();
         switch (option)
         {
             case "1":
@@ -262,7 +261,6 @@ class Program
         Console.WriteLine("4.Logout");
         Console.WriteLine("Enter your options:");
         string option = Console.ReadLine();
-        Console.Clear();
         switch (option)
         {
             case "1":
