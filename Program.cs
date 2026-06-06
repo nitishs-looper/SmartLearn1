@@ -219,6 +219,63 @@ class Program
         }
         Console.Clear();
     }
+    static void showinstructordashboard()
+    {
+        Console.WriteLine("===============");
+        Console.WriteLine("Instructor Dashboard:");
+        Console.WriteLine("===============");
+        Console.WriteLine("1.Create Course");
+        Console.WriteLine("2.Manage Courses");
+        Console.WriteLine("3.View Enrollments");
+        Console.WriteLine("4.Grade Assignments");
+        Console.WriteLine("5.Logout");
+        Console.WriteLine("Enter your options:");
+        string option = Console.ReadLine();
+        Console.Clear();
+        switch (option)
+        {
+            case "1":
+                Console.WriteLine("Course creation coming soon!"); break;
+            case "2":
+                Console.WriteLine("Course management coming soon!"); break;
+            case "3":
+                Console.WriteLine("Enrollment viewing coming soon!"); break;
+            case "4":
+                Console.WriteLine("Assignment grading coming soon!"); break;
+            case "5":
+                Console.WriteLine("Logout option coming soon"); break;
+            default:
+                Console.WriteLine("Invalid option. Please choose from 1-5."); break;
+        }
+        Console.Clear();
+    }
+    static void showadmindashboard()
+    {
+        Console.WriteLine("===============");
+        Console.WriteLine("Admin Dashboard:");
+        Console.WriteLine("===============");
+        Console.WriteLine("1.User Management");
+        Console.WriteLine("2.Course Management");
+        Console.WriteLine("3.System Settings");
+        Console.WriteLine("4.Logout");
+        Console.WriteLine("Enter your options:");
+        string option = Console.ReadLine();
+        Console.Clear();
+        switch (option)
+        {
+            case "1":
+                Console.WriteLine("User management coming soon!"); break;
+            case "2":
+                Console.WriteLine("Course management coming soon!"); break;
+            case "3":
+                Console.WriteLine("System settings coming soon!"); break;
+            case "4":
+                Console.WriteLine("Logout option coming soon"); break;
+            default:
+                Console.WriteLine("Invalid option. Please choose from 1-4."); break;
+        }
+        Console.Clear();
+    }
         static void exit()
         {
             Console.WriteLine("Exiting the application. Goodbye!");
