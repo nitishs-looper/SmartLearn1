@@ -1,6 +1,8 @@
-﻿using System;
+﻿using ICSharpCode.Decompiler.CSharp.Syntax;
+using System;
 using System.Data;
 using System.Reflection.Metadata;
+using System.Security.Principal;
 
 namespace project;
 
@@ -79,8 +81,8 @@ class Program
         {
             Console.WriteLine("Invalid username or password. Please try again.");
         }
-        Console.WriteLine("Enter your role (Student/Instructor/Admin):");
-        String role = Console.ReadLine();
+        Console.WriteLine("Enter your desired role (Student/Instructor/Admin):");
+        string role = Console.ReadLine();
         Console.Clear();
         switch (role)
         {
@@ -95,7 +97,7 @@ class Program
         }
     }
     static void register()
-    {
+    {   
         Console.WriteLine("=====Register=====");
         Console.WriteLine("Enter your desired username:");
         String username = Console.ReadLine();
@@ -116,15 +118,15 @@ class Program
             validateemail(email);
         }
         Console.WriteLine("Enter your desired role (Student/Instructor/Admin):");
-        String role = Console.ReadLine();
-        if (role != "Student" && role != "Instructor" && role != "Admin")
+        String roles = Console.ReadLine();
+        if (roles != "Student" && roles != "Instructor" && roles != "Admin")
         {
             Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin.");
             return;
         }
         Console.WriteLine("Registration successful! You can now log in with your credentials.");
         user.Add(username, password);
-        usera.Add(email, role);
+        usera.Add(email, roles);
     }
 
     static void validateusername(string username)
