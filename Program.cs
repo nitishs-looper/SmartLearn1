@@ -266,7 +266,7 @@ class Program
             case "1":
                 Console.WriteLine("User management coming soon!"); break;
             case "2":
-                Console.WriteLine("Course management coming soon!"); break; break;
+                Console.WriteLine("Course management coming soon!"); break;
             case "3":
                 Console.WriteLine("System settings coming soon!"); break;
             case "4":
