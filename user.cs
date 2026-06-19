@@ -21,4 +21,11 @@ public class User
     {
         return Password == inputPassword;
     }
-    
+    public void changePassword(string newPassword)
+    {
+        Password = newPassword;
+        Console.WriteLine("Password changed successfully.");
+    }
+    bool isactive = true;
+    public DateTimeOffset DateRegistered { get; set; } = DateTimeOffset.UtcNow;
+}
