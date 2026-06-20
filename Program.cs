@@ -8,8 +8,8 @@ namespace project;
 
 class Program
 {
-    static List<string> user = new List<string>();
-    static List<string> usera = new List<string>();
+    static Dictionary<string, string> user = new Dictionary<string, string>();
+    static Dictionary<string, string> usera = new Dictionary<string, string>();
     static void Main(String[] args)
     {
         bool enter = true;
@@ -44,7 +44,7 @@ class Program
         }
     }
 
-    static List<
+    static readonly string[] courses = {
         "C# Programming Fundamentals",
         "Introduction to SQL Server",
         "Web Development with ASP.NET Core",
@@ -54,7 +54,8 @@ class Program
         "Entity Framework Core",
         "Front-End Development with React",
         "Cloud Computing with Azure",
-        "Software Testing and Quality Assurance">;
+        "Software Testing and Quality Assurance"
+    };
     static void PrintCourses()
     {
         Console.WriteLine("=====Available Courses=====");
@@ -265,7 +266,7 @@ class Program
             case "1":
                 Console.WriteLine("User management coming soon!"); break;
             case "2":
-                Console.WriteLine("Course management coming soon!"); break; break;
+                Console.WriteLine("Course management coming soon!"); break;
             case "3":
                 Console.WriteLine("System settings coming soon!"); break;
             case "4":
