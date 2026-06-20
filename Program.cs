@@ -1,11 +1,10 @@
 ﻿using ICSharpCode.Decompiler.CSharp.Syntax;
+using SmartLearn1;
 using System;
 using System.Data;
 using System.Reflection.Metadata;
 using System.Security.Principal;
-
 namespace project;
-
 class Program
 {
     static Dictionary<string, string> user = new Dictionary<string, string>();
@@ -40,7 +39,14 @@ class Program
                     Console.WriteLine("Invalid choice. Enter from 1-4");
                     break;
             }
-
+            User test = new User("nitish", "12345", "nitishspnh@gmail.com", "Student");
+            test.changePassword("newpassword123");
+            Course test1 = new Course(1, "Learn the basics of C# programming.", "Enjoy coding", "Nitish", 10, "pragramming");
+            for (int i = 0; i < 5; i++)
+            {
+                test1.incrementEnrollment(i);
+            }
+            bool max = test1.CanEnroll();
         }
     }
 
@@ -73,6 +79,7 @@ class Program
         String username = Console.ReadLine();
         Console.WriteLine("Enter your password:");
         String password = Console.ReadLine();
+        String[] roles = { "Student", "Instructor", "Admin" };
         if (user.ContainsKey(username) && user[username] == password)
         {
             Console.WriteLine("Login successful! Welcome, " + username + "!");
@@ -81,19 +88,23 @@ class Program
         {
             Console.WriteLine("Invalid username or password. Please try again.");
         }
-        Console.WriteLine("Enter your desired role (Student/Instructor/Admin):");
-        string role = Console.ReadLine();
-        Console.Clear();
-        switch (role)
+        for (int i = 0; i < roles.Length; i++)
         {
-            case "Student":
-                showstudentdashboard(); break;
-            case "Instructor":
-                showinstructordashboard(); break;
-            case "Admin":
-                showadmindashboard(); break;
-            default:
-                Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin."); break;
+            if (usera.ContainsValue(roles[i]))
+            {
+                Console.Clear();
+                switch (roles[i])
+                {
+                    case "Student":
+                        showstudentdashboard(); break;
+                    case "Instructor":
+                        showinstructordashboard(); break;
+                    case "Admin":
+                        showadmindashboard(); break;
+                    default:
+                        Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin."); break;
+                }
+            }
         }
     }
     static void register()
@@ -280,6 +291,4 @@ class Program
         {
             Console.WriteLine("Exiting the application. Goodbye!");
         }
-
-    
 }

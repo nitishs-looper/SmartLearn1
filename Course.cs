@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmartLearn1
 {
-    class Course
+    public class Course
     {
         int CourseId;
         String Title;
@@ -25,16 +25,9 @@ namespace SmartLearn1
             CurrentEnrollments = 0;
             Category = category;
         }
-    public void CanEnroll()
+    public bool CanEnroll()
         {
-            if (CurrentEnrollments < MaxStudents)
-            {
-                Console.WriteLine($"You can enroll in {Title}.");
-            }
-            else
-            {
-                Console.WriteLine($"Sorry, {Title} is full. You cannot enroll.");
-            }
+            return CurrentEnrollments < MaxStudents;
         }
         public void DisplayInfo()
         {
@@ -46,7 +39,7 @@ namespace SmartLearn1
             Console.WriteLine($"Current Enrollments: {CurrentEnrollments}");
             Console.WriteLine("Category: " + Category);
         }
-        public void incrementEnrollment()
+        public void incrementEnrollment(int multiple)
         {
             if (CurrentEnrollments < MaxStudents)
             {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SmartLearn1
 {
-    class Enrollment
+    public class Enrollment
     {
       int EnrollmentId;
       String StudentUsername;
