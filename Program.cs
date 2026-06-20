@@ -4,11 +4,15 @@ using System;
 using System.Data;
 using System.Reflection.Metadata;
 using System.Security.Principal;
+using System.Collections.Generic;
 namespace project;
 class Program
 {
-    static Dictionary<string, string> user = new Dictionary<string, string>();
-    static Dictionary<string, string> usera = new Dictionary<string, string>();
+    static List<User> users = new List<User>();
+    static List<Course> courses = new List<Course>();
+    static List<Enrollment> enrollments = new List<Enrollment>();
+    static bool isLoggedIn = false; 
+    static User currentUser = null;
     static void Main(String[] args)
     {
         bool enter = true;
@@ -50,22 +54,12 @@ class Program
         }
     }
 
-    static readonly string[] courses = {
-        "C# Programming Fundamentals",
-        "Introduction to SQL Server",
-        "Web Development with ASP.NET Core",
-        "Advanced C# Techniques",
-        "Database Design Principles",
-        "RESTful API Development",
-        "Entity Framework Core",
-        "Front-End Development with React",
-        "Cloud Computing with Azure",
-        "Software Testing and Quality Assurance"
-    };
+    
+
     static void PrintCourses()
     {
         Console.WriteLine("=====Available Courses=====");
-        for (int i = 0; i < courses.Length; i++)
+        for (int i = 0; i < courses.count ; i++)
         {
             Console.WriteLine($"{i + 1}. {courses[i]}");
         }
@@ -80,7 +74,7 @@ class Program
         Console.WriteLine("Enter your password:");
         String password = Console.ReadLine();
         String[] roles = { "Student", "Instructor", "Admin" };
-        if (user.ContainsKey(username) && user[username] == password)
+        if (users.Contains(username) && users[username] == password)
         {
             Console.WriteLine("Login successful! Welcome, " + username + "!");
         }
@@ -90,7 +84,7 @@ class Program
         }
         for (int i = 0; i < roles.Length; i++)
         {
-            if (usera.ContainsValue(roles[i]))
+            if (users.Contains(roles[i]))
             {
                 Console.Clear();
                 switch (roles[i])
@@ -136,13 +130,14 @@ class Program
             return;
         }
         Console.WriteLine("Registration successful! You can now log in with your credentials.");
-        user.Add(username, password);
-        usera.Add(email, roles);
+        users.Add(new User(username, password, email, roles));
     }
+    
+   
 
     static void validateusername(string username)
     {
-        if (user.ContainsKey(username))
+        if (users.Contains(username))
         {
             Console.WriteLine("Username already exists. Please choose a different username.");
             Console.WriteLine("Enter your new username:");
@@ -151,7 +146,7 @@ class Program
     }
     static void validateemail(String email)
     {
-        if (usera.ContainsKey(email))
+        if (users.Contains(email))
         {
             Console.WriteLine("Email already exists. Please choose a different email.");
             Console.WriteLine("enter your new email:");
@@ -176,12 +171,12 @@ class Program
         if (keyword != null)
         {
             Console.WriteLine("Courses found:");
-            foreach (var course in courses)
+            foreach (var courses in Courses)
             {
-                if (course.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if (Courses.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 {
                     browsecounter++;
-                    Console.WriteLine($"{browsecounter}.{course}");
+                    Console.WriteLine($"{browsecounter}.{courses}");
                     found = true;
                 }
             }
