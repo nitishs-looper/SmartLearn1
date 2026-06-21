@@ -43,15 +43,15 @@ class Program
                     Console.WriteLine("Invalid choice. Enter from 1-4");
                     break;
             }
-            User test = new User("nitish", "12345", "nitishspnh@gmail.com", "Student");
-            test.changePassword("newpassword123");
-            Course test1 = new Course(1, "Learn the basics of C# programming.", "Enjoy coding", "Nitish", 10, "pragramming");
-            for (int i = 0; i < 5; i++)
-            {
-                test1.incrementEnrollment(i);
-            }
-            bool max = test1.CanEnroll();
-            courses.Add(test1);
+            //User test = new User("nitish", "12345", "nitishspnh@gmail.com", "Student");
+            //test.changePassword("newpassword123");
+            //Course test1 = new Course(1, "Learn the basics of C# programming.", "Enjoy coding", "Nitish", 10, "pragramming");
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    test1.incrementEnrollment(i);
+            //}
+            //bool max = test1.CanEnroll();
+            //courses.Add(test1);
         }
     }
     static void PrintCourses()
@@ -106,19 +106,34 @@ class Program
         String username = Console.ReadLine();
         if (username != null)
         {
-            validateusername(username);
+            if (users.Exists(u => u.Username == username))
+            {
+                Console.WriteLine("Username already exists. Please choose a different username.");
+                Console.WriteLine("Enter your new username:");
+                username = Console.ReadLine();
+            }
         }
         Console.WriteLine("Enter your desired password:");
         String password = Console.ReadLine();
         if (password != null)
         {
-            validatepassword(password);
+            if (password.Length < 6)
+            {
+                Console.WriteLine("Password must be at least 6 characters long. Please choose a stronger password.");
+                Console.WriteLine("Enter your password again:");
+                password = Console.ReadLine();
+            }
         }
         Console.WriteLine("Enter your desired email:");
         String email = Console.ReadLine();
         if (email != null)
         {
-            validateemail(email);
+            if (users.Exists(u => u.Email == email))
+            {
+                Console.WriteLine("Email already exists. Please choose a different email.");
+                Console.WriteLine("enter your new email:");
+                email = Console.ReadLine();
+            }
         }
         Console.WriteLine("Enter your desired role (Student/Instructor/Admin):");
         String roles = Console.ReadLine();
@@ -127,35 +142,9 @@ class Program
             Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin.");
             return;
         }
+        User proj = new User(username, password, email, roles);
+        users.Add(proj);
         Console.WriteLine("Registration successful! You can now log in with your credentials.");
-        users.Add(new User(username, password, email, roles));
-    }
-    static void validateusername(string username)
-    {
-        if(users.Exists(u => u.Username == username))
-        {
-            Console.WriteLine("Username already exists. Please choose a different username.");
-            Console.WriteLine("Enter your new username:");
-            username = Console.ReadLine();
-        }
-    }
-    static void validateemail(String email)
-    {
-        if(users.Exists(u => u.Email == email))
-        {
-            Console.WriteLine("Email already exists. Please choose a different email.");
-            Console.WriteLine("enter your new email:");
-            email = Console.ReadLine();
-        }
-    }
-    static void validatepassword(String password)
-    {
-        if (password.Length < 6)
-        {
-            Console.WriteLine("Password must be at least 6 characters long. Please choose a stronger password.");
-            Console.WriteLine("Enter your password again:");
-            password = Console.ReadLine();
-        }
     }
     static void browseCourses()
     {
@@ -220,7 +209,6 @@ class Program
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-5."); break;
         }
-        Console.Clear();
     }
     static void showinstructordashboard()
     {
@@ -249,7 +237,6 @@ class Program
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-5."); break;
         }
-        Console.Clear();
     }
     static void showadmindashboard()
     {
@@ -275,7 +262,6 @@ class Program
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-4."); break;
         }
-        Console.Clear();
     }
         static void exit()
         {
