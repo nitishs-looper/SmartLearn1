@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace SmartLearn1
-{
     public class Course
     {
-        int CourseId;
-        String Title;
-        String Description;
-        String InstructorName;
-        int MaxStudents;
+        public int CourseId;
+        public String Title;
+        public String Description;
+        public String InstructorName;
+        public int MaxStudents;
         int CurrentEnrollments;
-        String Category;
+        public String Category;
 
         public Course(int courseId, String title, String description, String instructorName, int maxStudents , String category)
         {
@@ -57,4 +55,4 @@ namespace SmartLearn1
         }
 
     }
-}
+
