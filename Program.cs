@@ -51,21 +51,19 @@ class Program
                 test1.incrementEnrollment(i);
             }
             bool max = test1.CanEnroll();
+            courses.Add(test1);
         }
     }
-
-    
-
     static void PrintCourses()
     {
-        Console.WriteLine("=====Available Courses=====");
-        for (int i = 0; i < courses.count ; i++)
+        Console.WriteLine("Top Courses:");
+        for (int i = 0; i < courses.Count; i++)
         {
+            Console.WriteLine("============================");
             Console.WriteLine($"{i + 1}. {courses[i]}");
         }
         browseCourses();
     }
-
     static void login()
     {
         Console.WriteLine("=====Login=====");
@@ -74,7 +72,7 @@ class Program
         Console.WriteLine("Enter your password:");
         String password = Console.ReadLine();
         String[] roles = { "Student", "Instructor", "Admin" };
-        if (users.Contains(username) && users[username] == password)
+        if(users.Exists(u => u.Username == username && u.Password == password))
         {
             Console.WriteLine("Login successful! Welcome, " + username + "!");
         }
@@ -84,7 +82,7 @@ class Program
         }
         for (int i = 0; i < roles.Length; i++)
         {
-            if (users.Contains(roles[i]))
+            if(users.Exists(u => u.Username == username && u.Password == password && u.Role == roles[i]))
             {
                 Console.Clear();
                 switch (roles[i])
@@ -132,12 +130,9 @@ class Program
         Console.WriteLine("Registration successful! You can now log in with your credentials.");
         users.Add(new User(username, password, email, roles));
     }
-    
-   
-
     static void validateusername(string username)
     {
-        if (users.Contains(username))
+        if(users.Exists(u => u.Username == username))
         {
             Console.WriteLine("Username already exists. Please choose a different username.");
             Console.WriteLine("Enter your new username:");
@@ -146,7 +141,7 @@ class Program
     }
     static void validateemail(String email)
     {
-        if (users.Contains(email))
+        if(users.Exists(u => u.Email == email))
         {
             Console.WriteLine("Email already exists. Please choose a different email.");
             Console.WriteLine("enter your new email:");
@@ -171,9 +166,9 @@ class Program
         if (keyword != null)
         {
             Console.WriteLine("Courses found:");
-            foreach (var courses in Courses)
+            foreach(var courses in courses)
             {
-                if (Courses.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if(courses.ToString().Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 {
                     browsecounter++;
                     Console.WriteLine($"{browsecounter}.{courses}");
