@@ -7,6 +7,7 @@ using System.Security.Principal;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 namespace project;
+
 class Program
 {
     static List<User> users = new List<User>();
@@ -19,8 +20,9 @@ class Program
         new Course(5, "Mobile App Development with Flutter: Build Cross-Platform Apps", "Create stunning mobile applications for both Android and iOS using Flutter framework.", "Michael Brown", 30, "mobile development")
     };
     static List<Enrollment> enrollments = new List<Enrollment>();
-    static bool isLoggedIn = false; 
+    static bool isLoggedIn = false;
     static User currentUser = null;
+    public static string currentUsername;
     static void Main(String[] args)
     {
         bool enter = true;
@@ -56,9 +58,9 @@ class Program
     static void LoadSampleCourses()
     {
         courses.Clear();
-        courses.Add(new Course(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30 , "Programming"));
-        courses.Add(new Course(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25 , "Database"));
-        courses.Add(new Course(3, "Python Interface Development","Create a User interface","Prof. Nitish",10,"Programming"));
+        courses.Add(new Course(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30, "Programming"));
+        courses.Add(new Course(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25, "Database"));
+        courses.Add(new Course(3, "Python Interface Development", "Create a User interface", "Prof. Nitish", 10, "Programming"));
         courses.Add(new Course(4, "Mobile App Development with Flutter", "Build cross-platform mobile apps", "Prof. Brown", 20, "Mobile Development"));
         courses.Add(new Course(5, "Web Development with React", "Learn to build web applications using React", "Prof. Davis", 15, "Web Development"));
     }
@@ -78,32 +80,72 @@ class Program
             Console.WriteLine("Number of total seats :" + course.MaxStudents + " ");
             Console.WriteLine("Belongs To :" + course.Category + " ");
         }
+        Console.WriteLine("======================================");
         Console.WriteLine("Enter the number of the course you want to enroll in:");
         int courseId = Convert.ToInt32(Console.ReadLine());
-        if(courseId<6)
+        if (courseId > 5)
         {
             Console.WriteLine("incorrect course number. Please enter a valid course number from the list.");
+        }
+        Course obj = courses.Find(c => c.CourseId == courseId);
+        bool c1 = obj.CanEnroll();
+        if (users.Exists(e => e.Username == currentUsername && e.Role == "Student"))
+        {
+            if (c1 == false)
+            {
+                Console.WriteLine("Sorry, There are no available seats in this course. Please choose a different course.");
+            }
+            else
+            {
+                int enrollmentid = enrollments.Count + 1;
+                obj.incrementEnrollment(1);
+                Enrollment enrollment = new Enrollment(enrollmentid, currentUsername, courseId);
+                enrollments.Add(enrollment);
+                Console.WriteLine("You have successfully enrolled in the course: " + obj.Title);
+            }
+        }
+        else
+        {
+            Console.WriteLine("You must be logged in as a student to enroll in courses. Please log in or register as a student to continue.");
         }
     }
     static void login()
     {
         Console.WriteLine("=====Login=====");
         Console.WriteLine("Enter your username:");
-        String username = Console.ReadLine();
-        if(username != null)
+        string username = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(username))
         {
-            if (!users.Exists(u => u.Username == username))
-            {
-                Console.WriteLine("Username does not exist. Please register first.");
-                return;
-            }
+            Console.WriteLine("Username cannot be empty. Please try again.");
+            return;
         }
+
+        if (!users.Exists(u => u.Username == username))
+        {
+            Console.WriteLine("Username does not exist. Please register first.");
+            return;
+        }
+
         Console.WriteLine("Enter your password:");
-        String password = Console.ReadLine();
-        String[] roles = { "Student", "Instructor", "Admin" };
+        string password = Console.ReadLine();
+
+        if (password == null)
+        {
+            Console.WriteLine("Password cannot be empty. Please try again.");
+            return;
+        }
+
         User checkpass = users.Find(u => u.Username == username);
+        if (checkpass == null)
+        {
+            // defensive, though we checked existence above
+            Console.WriteLine("Username does not exist. Please register first.");
+            return;
+        }
+
         bool get = checkpass.ValidatePassword(password);
-        if(get)
+        if (get)
         {
             isLoggedIn = true;
             currentUser = checkpass;
@@ -113,9 +155,11 @@ class Program
         {
             Console.WriteLine("Incorrect password. Please try again.");
         }
+        currentUsername = username;
+        string[] roles = { "Student", "Instructor", "Admin" };
         for (int i = 0; i < roles.Length; i++)
         {
-            if(users.Exists(u => u.Username == username && u.Password == password && u.Role == roles[i]))
+            if (users.Exists(u => u.Username == username && u.Password == password && u.Role == roles[i]))
             {
                 switch (roles[i])
                 {
@@ -132,7 +176,7 @@ class Program
         }
     }
     static void register()
-    {   
+    {
         Console.WriteLine("=====Register=====");
         Console.WriteLine("Enter your desired username:");
         String username = Console.ReadLine();
@@ -190,7 +234,7 @@ class Program
             Console.WriteLine("Courses found:");
             foreach (var courses in courses)
             {
-                if(courses.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if (courses.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 {
                     browsecounter++;
                     Console.WriteLine($"{browsecounter}.{courses.Title}");
@@ -298,6 +342,12 @@ class Program
     }
     static void exit()
     {
-            Console.WriteLine("Exiting the application. Goodbye!");
+        Console.WriteLine("Exiting the application. Goodbye!");
+    }
+    static void Logout()
+    {
+        isLoggedIn = false;
+        currentUser = null;
+        Console.WriteLine("You have been logged out successfully.");
     }
 }
