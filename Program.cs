@@ -48,66 +48,59 @@ class Program
                 case "3":
                     BrowseAndEnrollCourses(); break;
                 case "4":
-                    exit(); enter = false; break;
+                    Logout(); enter = false; break;
                 default:
                     Console.WriteLine("Invalid choice. Enter from 1-4");
                     break;
             }
         }
     }
-    static void LoadSampleCourses()
+    static void register()
     {
-        courses.Clear();
-        courses.Add(new Course(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30, "Programming"));
-        courses.Add(new Course(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25, "Database"));
-        courses.Add(new Course(3, "Python Interface Development", "Create a User interface", "Prof. Nitish", 10, "Programming"));
-        courses.Add(new Course(4, "Mobile App Development with Flutter", "Build cross-platform mobile apps", "Prof. Brown", 20, "Mobile Development"));
-        courses.Add(new Course(5, "Web Development with React", "Learn to build web applications using React", "Prof. Davis", 15, "Web Development"));
-    }
-    static void BrowseAndEnrollCourses()
-    {
-        LoadSampleCourses();
-        Console.WriteLine("===========");
-        Console.WriteLine("OUR COURSES:");
-        Console.WriteLine("===========");
-        foreach (var course in courses)
+        Console.WriteLine("=====Register=====");
+        Console.WriteLine("Enter your desired username:");
+        String username = Console.ReadLine();
+        if (username != null)
         {
-            Console.WriteLine("==========================================");
-            Console.Write(course.CourseId + ". ");
-            Console.WriteLine(course.Title + " ");
-            Console.WriteLine("=>" + course.Description);
-            Console.WriteLine("Instructor Name :" + course.InstructorName + " ");
-            Console.WriteLine("Number of total seats :" + course.MaxStudents + " ");
-            Console.WriteLine("Belongs To :" + course.Category + " ");
-        }
-        Console.WriteLine("======================================");
-        Console.WriteLine("Enter the number of the course you want to enroll in:");
-        int courseId = Convert.ToInt32(Console.ReadLine());
-        if (courseId > 5)
-        {
-            Console.WriteLine("incorrect course number. Please enter a valid course number from the list.");
-        }
-        Course obj = courses.Find(c => c.CourseId == courseId);
-        bool c1 = obj.CanEnroll();
-        if (users.Exists(e => e.Username == currentUsername && e.Role == "Student"))
-        {
-            if (c1 == false)
+            if (users.Exists(u => u.Username == username))
             {
-                Console.WriteLine("Sorry, There are no available seats in this course. Please choose a different course.");
-            }
-            else
-            {
-                int enrollmentid = enrollments.Count + 1;
-                obj.incrementEnrollment(1);
-                Enrollment enrollment = new Enrollment(enrollmentid, currentUsername, courseId);
-                enrollments.Add(enrollment);
-                Console.WriteLine("You have successfully enrolled in the course: " + obj.Title);
+                Console.WriteLine("Username already exists. Please choose a different username.");
+                Console.WriteLine("Enter your new username:");
+                username = Console.ReadLine();
             }
         }
-        else
+        Console.WriteLine("Enter your desired password:");
+        string password = Console.ReadLine();
+        if (password != null)
         {
-            Console.WriteLine("You must be logged in as a student to enroll in courses. Please log in or register as a student to continue.");
+            if (password.Length < 6)
+            {
+                Console.WriteLine("Password must be at least 6 characters long. Please choose a stronger password.");
+                Console.WriteLine("Enter your password again:");
+                password = Console.ReadLine();
+            }
         }
+        Console.WriteLine("Enter your desired email:");
+        String email = Console.ReadLine();
+        if (email != null)
+        {
+            if (users.Exists(u => u.Email == email))
+            {
+                Console.WriteLine("Email already exists. Please choose a different email.");
+                Console.WriteLine("enter your new email:");
+                email = Console.ReadLine();
+            }
+        }
+        Console.WriteLine("Enter your desired role (Student/Instructor/Admin):");
+        String roles = Console.ReadLine();
+        if (roles != "Student" && roles != "Instructor" && roles != "Admin")
+        {
+            Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin.");
+            return;
+        }
+        User proj = new User(username, password, email, roles);
+        users.Add(proj);
+        Console.WriteLine("Registration successful! You can now log in with your credentials.");
     }
     static void login()
     {
@@ -175,89 +168,128 @@ class Program
             }
         }
     }
-    static void register()
+    static void Logout()
     {
-        Console.WriteLine("=====Register=====");
-        Console.WriteLine("Enter your desired username:");
-        String username = Console.ReadLine();
-        if (username != null)
+        isLoggedIn = false;
+        currentUser = null;
+        Console.WriteLine("You have been logged out successfully.");
+    }
+    static void LoadSampleCourses()
+    {
+        courses.Clear();
+        courses.Add(new Course(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30, "Programming"));
+        courses.Add(new Course(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25, "Database"));
+        courses.Add(new Course(3, "Python Interface Development", "Create a User interface", "Prof. Nitish", 10, "Programming"));
+        courses.Add(new Course(4, "Mobile App Development with Flutter", "Build cross-platform mobile apps", "Prof. Brown", 20, "Mobile Development"));
+        courses.Add(new Course(5, "Web Development with React", "Learn to build web applications using React", "Prof. Davis", 15, "Web Development"));
+    }
+    static void BrowseAndEnrollCourses()
+    {
+        LoadSampleCourses();
+        Console.WriteLine("===========");
+        Console.WriteLine("OUR COURSES:");
+        Console.WriteLine("===========");
+        foreach (var course in courses)
         {
-            if (users.Exists(u => u.Username == username))
+            Console.WriteLine("==========================================");
+            Console.Write(course.CourseId + ". ");
+            Console.WriteLine(course.Title + " ");
+            Console.WriteLine("=>" + course.Description);
+            Console.WriteLine("Instructor Name :" + course.InstructorName + " ");
+            Console.WriteLine("Number of total seats :" + course.MaxStudents + " ");
+            Console.WriteLine("Belongs To :" + course.Category + " ");
+        }
+        Console.WriteLine("======================================");
+        Console.WriteLine("Enter the number of the course you want to enroll in:");
+        int courseId = Convert.ToInt32(Console.ReadLine());
+        if (courseId > 5)
+        {
+            Console.WriteLine("incorrect course number. Please enter a valid course number from the list.");
+        }
+        Course obj = courses.Find(c => c.CourseId == courseId);
+        bool c1 = obj.CanEnroll();
+        if (users.Exists(e => e.Username == currentUsername && e.Role == "Student"))
+        {
+            if (c1 == false)
             {
-                Console.WriteLine("Username already exists. Please choose a different username.");
-                Console.WriteLine("Enter your new username:");
-                username = Console.ReadLine();
+                Console.WriteLine("Sorry, There are no available seats in this course. Please choose a different course.");
+            }
+            else
+            {
+                int enrollmentid = enrollments.Count + 1;
+                obj.incrementEnrollment(1);
+                Enrollment enrollment = new Enrollment(enrollmentid, currentUsername, courseId);
+                enrollments.Add(enrollment);
+                Console.WriteLine("You have successfully enrolled in the course: " + obj.Title);
             }
         }
-        Console.WriteLine("Enter your desired password:");
-        string password = Console.ReadLine();
-        if (password != null)
+        else
         {
-            if (password.Length < 6)
-            {
-                Console.WriteLine("Password must be at least 6 characters long. Please choose a stronger password.");
-                Console.WriteLine("Enter your password again:");
-                password = Console.ReadLine();
-            }
+            Console.WriteLine("You must be logged in as a student to enroll in courses. Please log in or register as a student to continue.");
         }
-        Console.WriteLine("Enter your desired email:");
-        String email = Console.ReadLine();
-        if (email != null)
+    }
+    static void ShowMyEnrolledCourses()
+    {
+        Console.WriteLine("===========");
+        Console.WriteLine("My Courses:");
+        Console.WriteLine("===========");
+        var myEnrollments = enrollments.FindAll(e => e.Username == currentUsername);
+        if (myEnrollments.Count == 0)
         {
-            if (users.Exists(u => u.Email == email))
-            {
-                Console.WriteLine("Email already exists. Please choose a different email.");
-                Console.WriteLine("enter your new email:");
-                email = Console.ReadLine();
-            }
-        }
-        Console.WriteLine("Enter your desired role (Student/Instructor/Admin):");
-        String roles = Console.ReadLine();
-        if (roles != "Student" && roles != "Instructor" && roles != "Admin")
-        {
-            Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin.");
+            Console.WriteLine("You have not enrolled in any courses yet.");
             return;
         }
-        User proj = new User(username, password, email, roles);
-        users.Add(proj);
-        Console.WriteLine("Registration successful! You can now log in with your credentials.");
-    }
-    static void browseCourses()
-    {
-        Console.WriteLine("=====================");
-        Console.WriteLine("Enter search keyword:");
-        String keyword = Console.ReadLine();
-        int browsecounter = 0;
-        bool found = false;
-        if (keyword != null)
+        foreach (var enrollment in myEnrollments)
         {
-            Console.WriteLine("Courses found:");
-            foreach (var courses in courses)
+            Course course = courses.Find(c => c.CourseId == enrollment.CourseId);
+            if (course != null)
             {
-                if (courses.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                {
-                    browsecounter++;
-                    Console.WriteLine($"{browsecounter}.{courses.Title}");
-                    found = true;
-                }
-            }
-            if (!found)
-            {
-                Console.WriteLine("No courses found matching the keyword.");
-            }
-            Console.WriteLine("Would you try again? (y/n)");
-            String tryagain = Console.ReadLine();
-            switch (tryagain)
-            {
-                case "y":
-                    browseCourses(); break;
-                case "n":
-                    break;
-                default:
-                    break;
+                Console.WriteLine("==========================================");
+                Console.Write(course.CourseId + ". ");
+                Console.WriteLine(course.Title + " ");
+                Console.WriteLine("=>" + course.Description);
+                Console.WriteLine("Instructor Name :" + course.InstructorName + " ");
+                Console.WriteLine("Number of total seats :" + course.MaxStudents + " ");
+                Console.WriteLine("Belongs To :" + course.Category + " ");
             }
         }
     }
+    //static void browseCourses()
+    //{
+    //    Console.WriteLine("=====================");
+    //    Console.WriteLine("Enter search keyword:");
+    //    String keyword = Console.ReadLine();
+    //    int browsecounter = 0;
+    //    bool found = false;
+    //    if (keyword != null)
+    //    {
+    //        Console.WriteLine("Courses found:");
+    //        foreach (var courses in courses)
+    //        {
+    //            if (courses.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+    //            {
+    //                browsecounter++;
+    //                Console.WriteLine($"{browsecounter}.{courses.Title}");
+    //                found = true;
+    //            }
+    //        }
+    //        if (!found)
+    //        {
+    //            Console.WriteLine("No courses found matching the keyword.");
+    //        }
+    //        Console.WriteLine("Would you try again? (y/n)");
+    //        String tryagain = Console.ReadLine();
+    //        switch (tryagain)
+    //        {
+    //            case "y":
+    //                browseCourses(); break;
+    //            case "n":
+    //                break;
+    //            default:
+    //                break;
+    //        }
+    //    }
+    //}
     static void showstudentdashboard()
     {
         Console.WriteLine("===============");
@@ -339,15 +371,5 @@ class Program
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-4."); break;
         }
-    }
-    static void exit()
-    {
-        Console.WriteLine("Exiting the application. Goodbye!");
-    }
-    static void Logout()
-    {
-        isLoggedIn = false;
-        currentUser = null;
-        Console.WriteLine("You have been logged out successfully.");
     }
 }

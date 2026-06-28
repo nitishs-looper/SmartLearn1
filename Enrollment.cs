@@ -8,11 +8,14 @@ namespace SmartLearn1
     {
       int EnrollmentId;
       String StudentUsername;
-      int CourseId;
+      public int CourseId;
       DateTime EnrollmentDate;
       int ProgressPercentage;
       bool IsCompleted;
-    public Enrollment(int enrollmentId, String studentUsername, int courseId)
+
+        public string Username { get; internal set; }
+
+        public Enrollment(int enrollmentId, String studentUsername, int courseId)
         {
             EnrollmentId = enrollmentId;
             StudentUsername = studentUsername;
