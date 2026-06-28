@@ -3,46 +3,37 @@ using System;
 using System.Collections.Generic;
 public class Admin : User
 {
-    public List<string> ManagedUsernames { get; set; }
+    bool CanManageUsers;
+    bool CanManageCourses;
     public Admin(string username, string password, string email)
         : base(username, password, email, "Admin")
     {
-        ManagedUsernames = new List<string>();
+        CanManageUsers = true;
+        CanManageCourses = true;
     }
-    public void AddUser(string username)
-    {
-        if (!ManagedUsernames.Contains(username))
+    public void ViewAllUsers(List<User> users)
+    { Console.WriteLine("All Users:");
+        foreach (var user in users)
         {
-            ManagedUsernames.Add(username);
-            Console.WriteLine("✓ User added successfully!");
-        }
-        else
-        {
-            Console.WriteLine("❌ User already exists!");
+            user.DisplayInfo();
+            Console.WriteLine("--------------------");
         }
     }
-    public void RemoveUser(string username)
+    public void DeactivateUser(User user)
     {
-        if (ManagedUsernames.Contains(username))
-        {
-            ManagedUsernames.Remove(username);
-            Console.WriteLine("✓ User removed successfully!");
-        }
-        else
-        {
-            Console.WriteLine("❌ User not found!");
-        }
+        user.DeactivateAccount();
+        Console.WriteLine($"User {user.Username} has been deactivated.");
     }
-    public void ShowManagedUsers()
+    public void GetSystemStats(List<User> users, List<Course> courses)
+    { 
+        int totalUsers = users.Count;
+        int totalCourses = courses.Count;
+        Console.WriteLine($"Total Users: {totalUsers}");
+        Console.WriteLine($"Total Courses: {totalCourses}");
+    }
+   public void DisplayPermissions()
     {
-        if (ManagedUsernames.Count == 0)
-        {
-            Console.WriteLine("No managed users.");
-            return;
-        }
-        foreach (var username in ManagedUsernames)
-        {
-            Console.WriteLine($"Managed Username: {username}");
-        }
+        Console.WriteLine($"Can Manage Users: {CanManageUsers}");
+        Console.WriteLine($"Can Manage Courses: {CanManageCourses}");
     }
 }

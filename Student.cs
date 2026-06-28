@@ -5,6 +5,39 @@ public class Student : User
 {
     public List<int> EnrolledCourseIds { get; set; }
     public Dictionary<int, int> CourseProgress { get; set; }
+    public List<int> GetCompletedCourses()
+    { List<int> completedCourses = new List<int>();
+        foreach (var courseId in EnrolledCourseIds)
+        {
+            if (CourseProgress[courseId] >= 100)
+            {
+                completedCourses.Add(courseId);
+            }
+        }
+        return completedCourses;
+    }
+    public double GetAverageProgress()
+    {     if (EnrolledCourseIds.Count == 0) return 0;
+        double totalProgress = 0;
+        foreach (var courseId in EnrolledCourseIds)
+        {
+            totalProgress += CourseProgress[courseId];
+        }
+        return totalProgress / EnrolledCourseIds.Count;
+    }
+    public void DropCourse(int courseId)
+    {
+        if (EnrolledCourseIds.Contains(courseId))
+        {
+            EnrolledCourseIds.Remove(courseId);
+            CourseProgress.Remove(courseId);
+            Console.WriteLine("✓ Successfully dropped the course!");
+        }
+        else
+        {
+           Console.WriteLine("❌ Not enrolled in this course!");
+        }
+    }
     public Student(string username, string password, string email)
     : base(username, password, email, "Student")
     {

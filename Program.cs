@@ -48,7 +48,7 @@ class Program
                 case "3":
                     BrowseAndEnrollCourses(); break;
                 case "4":
-                    Logout(); enter = false; break;
+                    exit(); enter = false; break;
                 default:
                     Console.WriteLine("Invalid choice. Enter from 1-4");
                     break;
@@ -132,7 +132,6 @@ class Program
         User checkpass = users.Find(u => u.Username == username);
         if (checkpass == null)
         {
-            // defensive, though we checked existence above
             Console.WriteLine("Username does not exist. Please register first.");
             return;
         }
@@ -150,20 +149,30 @@ class Program
         }
         currentUsername = username;
         string[] roles = { "Student", "Instructor", "Admin" };
-        for (int i = 0; i < roles.Length; i++)
+        if (roles.Length > 0)
         {
-            if (users.Exists(u => u.Username == username && u.Password == password && u.Role == roles[i]))
+            foreach(string role in roles)
             {
-                switch (roles[i])
+                if (currentUser.Role == role)
                 {
-                    case "Student":
-                        showstudentdashboard(); break;
-                    case "Instructor":
-                        showinstructordashboard(); break;
-                    case "Admin":
-                        showadmindashboard(); break;
-                    default:
-                        Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin."); break;
+                    switch (role)
+                    {
+                        case "Student":
+                            Student student = new Student(currentUser.Username, currentUser.Password, currentUser.Email);
+                            showstudentdashboard(student);
+                            break;
+                        case "Instructor":
+                            Instructor instructor = new Instructor(currentUser.Username, currentUser.Password, currentUser.Email);
+                            showinstructordashboard(instructor);
+                            break;
+                        case "Admin":
+                            Admin admin = new Admin(currentUser.Username, currentUser.Password, currentUser.Email);
+                            showadmindashboard(admin);
+                            break;
+                        default:
+                            Console.WriteLine("Invalid role. Please contact the system administrator.");
+                            break;
+                    }
                 }
             }
         }
@@ -290,7 +299,7 @@ class Program
     //        }
     //    }
     //}
-    static void showstudentdashboard()
+    static void showstudentdashboard(Student student)
     {
         Console.WriteLine("===============");
         Console.WriteLine("Student Dashboard:");
@@ -308,18 +317,18 @@ class Program
             case "1":
                 BrowseAndEnrollCourses(); break;
             case "2":
-                Console.WriteLine("My Courses coming soon!"); break;
+                ShowMyEnrolledCourses(); break;
             case "3":
                 Console.WriteLine("Progress tracking coming soon!"); break;
             case "4":
                 Console.WriteLine("Quiz functionality coming soon!"); break;
             case "5":
-                Console.WriteLine("Logout option coming soon"); break;
+                Logout(); break;
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-5."); break;
         }
     }
-    static void showinstructordashboard()
+    static void showinstructordashboard(Instructor instructor)
     {
         Console.WriteLine("===============");
         Console.WriteLine("Instructor Dashboard:");
@@ -330,24 +339,29 @@ class Program
         Console.WriteLine("4.Grade Assignments");
         Console.WriteLine("5.Logout");
         Console.WriteLine("Enter your options:");
+        Instructor obj = new Instructor(instructor.Username, instructor.Password, instructor.Email);
         string option = Console.ReadLine();
         switch (option)
         {
             case "1":
-                Console.WriteLine("Course creation coming soon!"); break;
+                Console.WriteLine("Enter the courseId you wanna add");
+                int id = Convert.ToInt32(Console.ReadLine());
+                obj.AddCourse(id);
+                break;
             case "2":
                 Console.WriteLine("Course management coming soon!"); break;
             case "3":
-                Console.WriteLine("Enrollment viewing coming soon!"); break;
+                 break;
             case "4":
-                Console.WriteLine("Assignment grading coming soon!"); break;
+                obj.ShowMyCourses();
+                break;
             case "5":
-                Console.WriteLine("Logout option coming soon"); break;
+                Logout(); break;
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-5."); break;
         }
     }
-    static void showadmindashboard()
+    static void showadmindashboard(Admin admin)
     {
         Console.WriteLine("===============");
         Console.WriteLine("Admin Dashboard:");
@@ -358,18 +372,25 @@ class Program
         Console.WriteLine("4.Logout");
         Console.WriteLine("Enter your options:");
         string option = Console.ReadLine();
+        Admin obj=new Admin(admin.Username, admin.Password, admin.Email);
         switch (option)
         {
             case "1":
-                Console.WriteLine("User management coming soon!"); break;
+                obj.ViewAllUsers(users);
+                 break;
             case "2":
                 Console.WriteLine("Course management coming soon!"); break;
             case "3":
                 Console.WriteLine("System settings coming soon!"); break;
             case "4":
-                Console.WriteLine("Logout option coming soon"); break;
+                Logout(); break;
             default:
                 Console.WriteLine("Invalid option. Please choose from 1-4."); break;
         }
+    }
+    public static void exit()
+    {
+        Console.WriteLine("Thx for using our application!!!");
+        Environment.Exit(0);
     }
 }

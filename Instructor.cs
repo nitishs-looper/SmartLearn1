@@ -9,7 +9,32 @@ public class Instructor : User
     {
         CreatedCourseIds = new List<int>();
     }
-    public void CreateCourse(int courseId)
+    public int GetStudentCount(List<Enrollment> enrollments)
+    { int studentCount = 0;
+        foreach (var courseId in CreatedCourseIds)
+        {
+            foreach (var enrollment in enrollments)
+            {
+                if (enrollment.CourseId == courseId)
+                {
+                    studentCount++;
+                }
+            }
+        }
+        return studentCount;
+    }
+    public Course GetCourseById(int id, List<Course> courses)
+    {
+        foreach (var course in courses)
+        {
+            if (course.CourseId == id)
+            {
+                return course;
+            }
+        }
+        return null;
+    }
+    public void AddCourse(int courseId)
     {
         if (!CreatedCourseIds.Contains(courseId))
         {
@@ -21,7 +46,19 @@ public class Instructor : User
             Console.WriteLine("❌ Course already exists!");
         }
     }
-    public void ShowCreatedCourses()
+    public void RemoveCourse(int courseId)
+    {
+        if (CreatedCourseIds.Contains(courseId))
+        {
+            CreatedCourseIds.Remove(courseId);
+            Console.WriteLine("✓ Course removed successfully!");
+        }
+        else
+        {
+            Console.WriteLine("❌ Course not found!");
+        }
+    }
+    public void ShowMyCourses()
     {
         if (CreatedCourseIds.Count == 0)
         {
