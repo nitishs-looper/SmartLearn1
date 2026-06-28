@@ -7,7 +7,7 @@ namespace SmartLearn1
     public class Enrollment
     {
       int EnrollmentId;
-      String StudentUsername;
+      public String StudentUsername;
       public int CourseId;
       DateTime EnrollmentDate;
       int ProgressPercentage;

@@ -10,7 +10,7 @@ using System.Text;
         public String Description;
         public String InstructorName;
         public int MaxStudents;
-        int CurrentEnrollments;
+        public int CurrentEnrollments;
         public String Category;
 
         public Course(int courseId, String title, String description, String instructorName, int maxStudents , String category)
@@ -37,7 +37,7 @@ using System.Text;
             Console.WriteLine($"Current Enrollments: {CurrentEnrollments}");
             Console.WriteLine("Category: " + Category);
         }
-        public void incrementEnrollment(int multiple)
+        public void incrementEnrollment()
         {
             if (CurrentEnrollments < MaxStudents)
             {
