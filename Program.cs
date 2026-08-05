@@ -13,11 +13,11 @@ class Program
     static List<User> users = new List<User>();
     static List<Course> courses = new List<Course>()
     {
-        new Course(1, "Learn the basics of C# programming.", "Enjoy coding", "Nitish", 10, "programming"),
-        new Course(2, "Mastering Python: From Beginner to Pro", "Unlock the power of Python programming with our comprehensive course designed for all skill levels.", "John Doe", 15, "programming"),
-        new Course(3, "Web Development Bootcamp: HTML, CSS, JavaScript", "Become a full-stack web developer with our intensive bootcamp covering HTML, CSS, and JavaScript.", "Jane Smith", 20, "web development"),
-        new Course(4, "Data Science with R: From Data Analysis to Machine Learning", "Learn data science techniques using R programming language and apply them to real-world datasets.", "Emily Davis", 25, "data science"),
-        new Course(5, "Mobile App Development with Flutter: Build Cross-Platform Apps", "Create stunning mobile applications for both Android and iOS using Flutter framework.", "Michael Brown", 30, "mobile development")
+        new StandardCourse(1, "Learn the basics of C# programming.", "Enjoy coding", "Nitish", 10, "programming"),
+        new StandardCourse(2, "Mastering Python: From Beginner to Pro", "Unlock the power of Python programming with our comprehensive course designed for all skill levels.", "John Doe", 15, "programming"),
+        new StandardCourse(3, "Web Development Bootcamp: HTML, CSS, JavaScript", "Become a full-stack web developer with our intensive bootcamp covering HTML, CSS, and JavaScript.", "Jane Smith", 20, "web development"),
+        new StandardCourse(4, "Data Science with R: From Data Analysis to Machine Learning", "Learn data science techniques using R programming language and apply them to real-world datasets.", "Emily Davis", 25, "data science"),
+        new StandardCourse(5, "Mobile App Development with Flutter: Build Cross-Platform Apps", "Create stunning mobile applications for both Android and iOS using Flutter framework.", "Michael Brown", 30, "mobile development")
     };
     static List<Enrollment> enrollments = new List<Enrollment>();
     static bool isLoggedIn = false;
@@ -98,7 +98,10 @@ class Program
             Console.WriteLine("Invalid role. Please choose from Student, Instructor, or Admin.");
             return;
         }
-        User proj = new User(username, password, email, roles);
+        User proj;
+        if (roles == "Student") proj = new Student(username, password, email);
+        else if (roles == "Instructor") proj = new Instructor(username, password, email);
+        else proj = new Admin(username, password, email);
         users.Add(proj);
         Console.WriteLine("Registration successful! You can now log in with your credentials.");
     }
@@ -148,34 +151,8 @@ class Program
             Console.WriteLine("Incorrect password. Please try again.");
         }
         currentUsername = username;
-        string[] roles = { "Student", "Instructor", "Admin" };
-        if (roles.Length > 0)
-        {
-            foreach(string role in roles)
-            {
-                if (currentUser.Role == role)
-                {
-                    switch (role)
-                    {
-                        case "Student":
-                            Student student = new Student(currentUser.Username, currentUser.Password, currentUser.Email);
-                            showstudentdashboard(student);
-                            break;
-                        case "Instructor":
-                            Instructor instructor = new Instructor(currentUser.Username, currentUser.Password, currentUser.Email);
-                            showinstructordashboard(instructor);
-                            break;
-                        case "Admin":
-                            Admin admin = new Admin(currentUser.Username, currentUser.Password, currentUser.Email);
-                            showadmindashboard(admin);
-                            break;
-                        default:
-                            Console.WriteLine("Invalid role. Please contact the system administrator.");
-                            break;
-                    }
-                }
-            }
-        }
+        // Use polymorphism: call the dashboard on the actual user instance
+        currentUser.DisplayDashboard();
     }
     static void Logout()
     {
@@ -186,11 +163,11 @@ class Program
     static void LoadSampleCourses()
     {
         courses.Clear();
-        courses.Add(new Course(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30, "Programming"));
-        courses.Add(new Course(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25, "Database"));
-        courses.Add(new Course(3, "Python Interface Development", "Create a User interface", "Prof. Nitish", 10, "Programming"));
-        courses.Add(new Course(4, "Mobile App Development with Flutter", "Build cross-platform mobile apps", "Prof. Brown", 20, "Mobile Development"));
-        courses.Add(new Course(5, "Web Development with React", "Learn to build web applications using React", "Prof. Davis", 15, "Web Development"));
+        courses.Add(new StandardCourse(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30, "Programming"));
+        courses.Add(new StandardCourse(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25, "Database"));
+        courses.Add(new StandardCourse(3, "Python Interface Development", "Create a User interface", "Prof. Nitish", 10, "Programming"));
+        courses.Add(new StandardCourse(4, "Mobile App Development with Flutter", "Build cross-platform mobile apps", "Prof. Brown", 20, "Mobile Development"));
+        courses.Add(new StandardCourse(5, "Web Development with React", "Learn to build web applications using React", "Prof. Davis", 15, "Web Development"));
         Console.WriteLine("✓ Sample courses loaded successfully!");
     }
     static void EnrollStudentInCourse(Student student)
@@ -202,7 +179,7 @@ class Program
             Console.WriteLine($"Category: {course.Category}");
             Console.WriteLine($"Instructor: {course.InstructorName}");
             Console.WriteLine($"Enrollment: {course.CurrentEnrollments}/{course.MaxStudents}");
-            Console.WriteLine($"Available: {(course.CanEnroll() ? "✓ Yes" : "✗ Full")}");
+            Console.WriteLine($"Available: {(course.CanEnroll(student) ? "✓ Yes" : "✗ Full")}");
             Console.WriteLine("---");
         }
         Console.Write("\nEnter Course ID to enroll: ");
@@ -217,7 +194,7 @@ class Program
             Console.WriteLine(" Course not found.");
             return;
         }
-        if (!selectedCourse.CanEnroll())
+        if (!selectedCourse.CanEnroll(student))
         {
             Console.WriteLine(" Course is full!");
             return;
@@ -227,11 +204,17 @@ class Program
             Console.WriteLine(" Already enrolled in this course!");
             return;
         }
-        student.EnrollInCourse(courseId);
-        selectedCourse.incrementEnrollment();
-        int enrollmentId = enrollments.Count + 1; 
+        // Enroll via course implementation
+        ((IEnrollable)selectedCourse).Enroll(student);
+        int enrollmentId = enrollments.Count + 1;
         Enrollment newEnrollment = new Enrollment(enrollmentId, student.Username, courseId);
-        enrollments.Add(newEnrollment); 
+        enrollments.Add(newEnrollment);
+        // Notify instructor if possible
+        var instructorNotify = users.Find(u => u.Username == selectedCourse.InstructorName) as INotifiable;
+        if (instructorNotify != null)
+        {
+            instructorNotify.SendNotification($"Student {student.Username} has enrolled in your course '{selectedCourse.Title}' (ID: {courseId}).");
+        }
         Console.WriteLine($"✓ Successfully enrolled in '{selectedCourse.Title}'!");
     }
     static void UpdateStudentProgress(Student student)
@@ -266,11 +249,11 @@ class Program
             Console.WriteLine(" Invalid course ID.");
             return; 
         }
-        student.DropCourse(courseId);
         Course course = courses.Find(c => c.CourseId == courseId);
         if (course != null)
-        { 
-            course.decrementEnrollment();
+        {
+            // Delegate drop to course implementation which updates student and counts
+            ((IEnrollable)course).Drop(student);
         }
         Enrollment enrollment = enrollments.Find(e => e.StudentUsername == student.Username && e.CourseId == courseId);
         if (enrollment != null)
@@ -373,8 +356,10 @@ class Program
             Console.WriteLine("incorrect course number. Please enter a valid course number from the list.");
         }
         Course obj = courses.Find(c => c.CourseId == courseId);
-        bool c1 = obj.CanEnroll();
-        if (users.Exists(e => e.Username == currentUsername && e.Role == "Student"))
+        // find student by current username
+        var studentObj = users.Find(u => u.Username == currentUsername && u.Role == "Student") as Student;
+        bool c1 = studentObj != null ? obj.CanEnroll(studentObj) : false;
+        if (studentObj != null)
         {
             if (c1 == false)
             {
@@ -383,9 +368,15 @@ class Program
             else
             {
                 int enrollmentid = enrollments.Count + 1;
-                obj.incrementEnrollment();
+                ((IEnrollable)obj).Enroll(studentObj);
                 Enrollment enrollment = new Enrollment(enrollmentid, currentUsername, courseId);
                 enrollments.Add(enrollment);
+                // Notify instructor if possible
+                var instructorNotify = users.Find(u => u.Username == obj.InstructorName) as INotifiable;
+                if (instructorNotify != null)
+                {
+                    instructorNotify.SendNotification($"Student {studentObj.Username} has enrolled in your course '{obj.Title}' (ID: {courseId}).");
+                }
                 Console.WriteLine("You have successfully enrolled in the course: " + obj.Title);
             }
         }
@@ -420,95 +411,9 @@ class Program
             }
         }
     }
-    static void showstudentdashboard(Student student)
-    {
-        Console.WriteLine("===============");
-        Console.WriteLine("Student Dashboard:");
-        Console.WriteLine("===============");
-        Console.WriteLine("1.Browse Courses");
-        Console.WriteLine("2.My Courses");
-        Console.WriteLine("3.Progess");
-        Console.WriteLine("4.Take Quiz");
-        Console.WriteLine("5.Logout");
-        Console.WriteLine("Enter your options:");
-        string option = Console.ReadLine();
-        Console.Clear();
-        switch (option)
-        {
-            case "1":
-                BrowseAndEnrollCourses(); break;
-            case "2":
-                ShowMyEnrolledCourses(); break;
-            case "3":
-                Console.WriteLine("Progress tracking coming soon!"); break;
-            case "4":
-                Console.WriteLine("Quiz functionality coming soon!"); break;
-            case "5":
-                Logout(); break;
-            default:
-                Console.WriteLine("Invalid option. Please choose from 1-5."); break;
-        }
-    }
-    static void showinstructordashboard(Instructor instructor)
-    {
-        Console.WriteLine("===============");
-        Console.WriteLine("Instructor Dashboard:");
-        Console.WriteLine("===============");
-        Console.WriteLine("1.Create Course");
-        Console.WriteLine("2.Manage Courses");
-        Console.WriteLine("3.View Enrollments");
-        Console.WriteLine("4.Grade Assignments");
-        Console.WriteLine("5.Logout");
-        Console.WriteLine("Enter your options:");
-        Instructor obj = new Instructor(instructor.Username, instructor.Password, instructor.Email);
-        string option = Console.ReadLine();
-        switch (option)
-        {
-            case "1":
-                Console.WriteLine("Enter the courseId you wanna add");
-                int id = Convert.ToInt32(Console.ReadLine());
-                obj.AddCourse(id);
-                break;
-            case "2":
-                Console.WriteLine("Course management coming soon!"); break;
-            case "3":
-                 break;
-            case "4":
-                obj.ShowMyCourses();
-                break;
-            case "5":
-                Logout(); break;
-            default:
-                Console.WriteLine("Invalid option. Please choose from 1-5."); break;
-        }
-    }
-    static void showadmindashboard(Admin admin)
-    {
-        Console.WriteLine("===============");
-        Console.WriteLine("Admin Dashboard:");
-        Console.WriteLine("===============");
-        Console.WriteLine("1.User Management");
-        Console.WriteLine("2.Course Management");
-        Console.WriteLine("3.System Settings");
-        Console.WriteLine("4.Logout");
-        Console.WriteLine("Enter your options:");
-        string option = Console.ReadLine();
-        Admin obj=new Admin(admin.Username, admin.Password, admin.Email);
-        switch (option)
-        {
-            case "1":
-                obj.ViewAllUsers(users);
-                 break;
-            case "2":
-                Console.WriteLine("Course management coming soon!"); break;
-            case "3":
-                Console.WriteLine("System settings coming soon!"); break;
-            case "4":
-                Logout(); break;
-            default:
-                Console.WriteLine("Invalid option. Please choose from 1-4."); break;
-        }
-    }
+    // previous role-specific dashboard methods removed in favor of polymorphic DisplayDashboard on User
+    // instructor dashboard removed; Instructor.DisplayDashboard provides presentation
+    // admin dashboard removed; Admin.DisplayDashboard provides presentation
     public static void exit()
     {
         Console.WriteLine("Thx for using our application!!!");

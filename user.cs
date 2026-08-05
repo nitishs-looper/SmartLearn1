@@ -1,11 +1,50 @@
+using System;
+using System.Linq;
+
 namespace SmartLearn1;
-public class User
+public abstract class User
 {
     public string Username { get; set; }
-    public string Password { get; set; }
-    public string Email { get; set; }
+    private string _password;
+    public string Password
+    {
+        get => _password;
+        set
+        {
+            if (value == null || value.Length < 8)
+            {
+                Console.WriteLine("✗ Password must be at least 8 characters");
+                return;
+            }
+            if (!value.Any(char.IsDigit))
+            {
+                Console.WriteLine("✗ Password must contain at least 1 number");
+                return;
+            }
+            _password = value;
+        }
+    }
+    private string _email;
+    public string Email
+    {
+        get => _email;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Console.WriteLine("✗ Invalid email - must contain @");
+                return;
+            }
+            if (!value.Contains("@"))
+            {
+                Console.WriteLine("✗ Invalid email - must contain @");
+                return;
+            }
+            _email = value;
+        }
+    }
     public string Role { get; set; }
-    public User(string username, string password, string email, string role)
+    protected User(string username, string password, string email, string role)
     {
         Username = username;
         Password = password;
@@ -14,7 +53,16 @@ public class User
         isactive = true; // New accounts are active by default
         DateRegistered = DateTime.Now; // Set to current date/time
     }
-    public void DisplayInfo()
+    public virtual void DisplayInfo()
+    {
+        Console.WriteLine($"Username: {Username}");
+        Console.WriteLine($"Email: {Email}");
+        Console.WriteLine("Account Status: " + (isactive ? "Active" : "Inactive"));
+        Console.WriteLine("Date Registered: " + DateRegistered.ToString("g"));
+    }
+    //public abstract void DisplayDashboard();
+    //public abstract string GetUserType();
+    public virtual void DisplayInfoWithRole()
     {
         Console.WriteLine($"Username: {Username}");
         Console.WriteLine($"Email: {Email}");
@@ -22,6 +70,10 @@ public class User
         Console.WriteLine("Account Status: " + (isactive ? "Active" : "Inactive"));
         Console.WriteLine("Date Registered: " + DateRegistered.ToString("g"));
     }
+
+    // Abstract members that derived classes must implement
+    public abstract void DisplayDashboard();
+    public abstract string GetUserType();
     public bool ValidatePassword(string inputPassword)
     {
         return Password == inputPassword;
@@ -43,4 +95,7 @@ public class User
         isactive = true;
         Console.WriteLine("Account activated.");
     }
+
+    // Expose account active state for administrative checks
+    public bool IsActive => isactive;
 }
