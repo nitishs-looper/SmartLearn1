@@ -23,7 +23,20 @@ namespace SmartLearn1
         }
         public string Description;
         public string InstructorName;
-        public int MaxStudents;
+        private int _maxStudents;
+        public virtual int MaxStudents
+        {
+            get => _maxStudents;
+            set
+            {
+                if (value <= 0)
+                {
+                    Console.WriteLine("✗ Max students must be greater than 0");
+                    return;
+                }
+                _maxStudents = value;
+            }
+        }
         public int CurrentEnrollments;
         public string Category;
 
