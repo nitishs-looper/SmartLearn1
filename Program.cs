@@ -162,13 +162,62 @@ class Program
     }
     static void LoadSampleCourses()
     {
-        courses.Clear();
-        courses.Add(new StandardCourse(1, "C# Programming Fundamentals", "Learn the basics of C#", "Prof. Smith", 30, "Programming"));
-        courses.Add(new StandardCourse(2, "Introduction to SQL Server", "Database fundamentals", "Prof. Johnson", 25, "Database"));
-        courses.Add(new StandardCourse(3, "Python Interface Development", "Create a User interface", "Prof. Nitish", 10, "Programming"));
-        courses.Add(new StandardCourse(4, "Mobile App Development with Flutter", "Build cross-platform mobile apps", "Prof. Brown", 20, "Mobile Development"));
-        courses.Add(new StandardCourse(5, "Web Development with React", "Learn to build web applications using React", "Prof. Davis", 15, "Web Development"));
+        // Initialize the more extensive sample set
+        InitializeCourses();
         Console.WriteLine("✓ Sample courses loaded successfully!");
+    }
+
+    // InitializeCourses: populate the courses list with at least 10 sample courses
+    static void InitializeCourses()
+    {
+        courses.Clear();
+
+        // 5 Online Courses (IDs 101-105)
+        courses.Add(new OnlineCourse(101, "C# Fundamentals", "Learn C# fundamentals from variables to OOP.", "Prof. Smith", 450, "Programming"));
+        courses.Add(new OnlineCourse(102, "Python for Beginners", "A gentle introduction to Python programming.", "Prof. Johnson", 360, "Programming"));
+        courses.Add(new OnlineCourse(103, "Web Development Basics", "HTML, CSS and JavaScript for beginners.", "Prof. Williams", 540, "Web Development"));
+        courses.Add(new OnlineCourse(104, "Data Structures", "Core data structures and algorithms in practice.", "Prof. Brown", 600, "Programming"));
+        courses.Add(new OnlineCourse(105, "Machine Learning Intro", "Introductory machine learning concepts and workflows.", "Prof. Davis", 720, "Data Science"));
+
+        // 3 In-Person Courses (IDs 201-203)
+        courses.Add(new InPersonCourse(201, "Database Design Workshop", "Design relational databases and ER modelling.", "Prof. Taylor", 25, "B-101", "Engineering Building", "Database"));
+        courses.Add(new InPersonCourse(202, "Network Security Lab", "Hands-on network security lab sessions.", "Prof. Anderson", 20, "C-205", "CS Building", "Security"));
+        courses.Add(new InPersonCourse(203, "Mobile App Development", "In-person mobile app labs and pair programming.", "Prof. Martinez", 30, "A-301", "Tech Center", "Mobile Development"));
+
+        // 2 Hybrid Courses (IDs 301-302)
+        courses.Add(new HybridCourse(301, "Full-Stack Development", "Combination of online content and in-person workshops.", "Prof. Clark", 30, 720, "C-201", "CS Building", "Web Development"));
+        courses.Add(new HybridCourse(302, "Cloud Computing", "Cloud fundamentals with online labs and on-campus sessions.", "Prof. Lewis", 25, 600, "D-101", "Engineering Building", "Cloud"));
+    }
+
+    // UniversalSearch: search across courses and searchable users (e.g., students)
+    static void UniversalSearch(List<Course> courseList, List<User> userList)
+    {
+        var combined = new List<ISearchable>();
+
+        if (courseList != null)
+        {
+            foreach (var c in courseList)
+            {
+                if (c != null) combined.Add(c);
+            }
+        }
+
+        if (userList != null)
+        {
+            foreach (var u in userList)
+            {
+                if (u is ISearchable s)
+                {
+                    combined.Add(s);
+                }
+            }
+        }
+
+        Console.WriteLine("Enter search keyword:");
+        string keyword = Console.ReadLine();
+
+        var results = SearchEngine.Search(combined, keyword);
+        SearchEngine.DisplayResults(results);
     }
     static void EnrollStudentInCourse(Student student)
     {
@@ -334,56 +383,71 @@ class Program
     }
     static void BrowseAndEnrollCourses()
     {
+        // Ensure sample data is loaded
         LoadSampleCourses();
-        Console.WriteLine("===========");
-        Console.WriteLine("OUR COURSES:");
-        Console.WriteLine("===========");
+
+        // Header with box-drawing characters
+        Console.WriteLine("╔════════════════════════════════════════════════╗");
+        Console.WriteLine("║                AVAILABLE COURSES               ║");
+        Console.WriteLine("╚════════════════════════════════════════════════╝");
+
+        // Determine current student (may be null if not logged in)
+        var studentObj = users.Find(u => u.Username == currentUsername && u.Role == "Student") as Student;
+
+        // Loop through courses and let each course display its own info
         foreach (var course in courses)
         {
             Console.WriteLine("==========================================");
-            Console.Write(course.CourseId + ". ");
-            Console.WriteLine(course.Title + " ");
-            Console.WriteLine("=>" + course.Description);
-            Console.WriteLine("Instructor Name :" + course.InstructorName + " ");
-            Console.WriteLine("Number of total seats :" + course.MaxStudents + " ");
-            Console.WriteLine("Belongs To :" + course.Category + " ");
+            // Polymorphic display - each concrete course prints its format
+            course.DisplayCourseInfo();
+
+            // Show availability using polymorphic CanEnroll
+            bool available = course.CanEnroll(studentObj);
+            Console.WriteLine($"Status: {(available ? "✓ Available" : "✗ Full")}");
         }
-        Console.WriteLine("======================================");
-        Console.WriteLine("Enter the number of the course you want to enroll in:");
-        int courseId = Convert.ToInt32(Console.ReadLine());
-        if (courseId > 5)
+
+        Console.WriteLine("==========================================");
+        Console.Write("Enter the Course ID to enroll (or 0 to cancel): ");
+        if (!int.TryParse(Console.ReadLine(), out int selectedId) || selectedId == 0)
         {
-            Console.WriteLine("incorrect course number. Please enter a valid course number from the list.");
+            Console.WriteLine("Cancelled or invalid input.");
+            return;
         }
-        Course obj = courses.Find(c => c.CourseId == courseId);
-        // find student by current username
-        var studentObj = users.Find(u => u.Username == currentUsername && u.Role == "Student") as Student;
-        bool c1 = studentObj != null ? obj.CanEnroll(studentObj) : false;
-        if (studentObj != null)
+
+        var selectedCourse = courses.Find(c => c.CourseId == selectedId);
+        if (selectedCourse == null)
         {
-            if (c1 == false)
-            {
-                Console.WriteLine("Sorry, There are no available seats in this course. Please choose a different course.");
-            }
-            else
-            {
-                int enrollmentid = enrollments.Count + 1;
-                ((IEnrollable)obj).Enroll(studentObj);
-                Enrollment enrollment = new Enrollment(enrollmentid, currentUsername, courseId);
-                enrollments.Add(enrollment);
-                // Notify instructor if possible
-                var instructorNotify = users.Find(u => u.Username == obj.InstructorName) as INotifiable;
-                if (instructorNotify != null)
-                {
-                    instructorNotify.SendNotification($"Student {studentObj.Username} has enrolled in your course '{obj.Title}' (ID: {courseId}).");
-                }
-                Console.WriteLine("You have successfully enrolled in the course: " + obj.Title);
-            }
+            Console.WriteLine("Course not found. Please enter a valid Course ID from the list.");
+            return;
         }
-        else
+
+        if (studentObj == null)
         {
             Console.WriteLine("You must be logged in as a student to enroll in courses. Please log in or register as a student to continue.");
+            return;
         }
+
+        // Check enrollment eligibility using polymorphic CanEnroll
+        if (!selectedCourse.CanEnroll(studentObj))
+        {
+            Console.WriteLine("✗ Full or not eligible to enroll in this course.");
+            return;
+        }
+
+        // Enroll via the IEnrollable implementation (polymorphic behavior)
+        ((IEnrollable)selectedCourse).Enroll(studentObj);
+        int enrollmentId = enrollments.Count + 1;
+        Enrollment newEnrollment = new Enrollment(enrollmentId, studentObj.Username, selectedId);
+        enrollments.Add(newEnrollment);
+
+        // Notify instructor if they implement INotifiable
+        var instructorNotify = users.Find(u => u.Username == selectedCourse.InstructorName) as INotifiable;
+        if (instructorNotify != null)
+        {
+            instructorNotify.SendNotification($"Student {studentObj.Username} has enrolled in your course '{selectedCourse.Title}' (ID: {selectedId}).");
+        }
+
+        Console.WriteLine($"✓ Successfully enrolled in '{selectedCourse.Title}'!");
     }
     static void ShowMyEnrolledCourses()
     {
