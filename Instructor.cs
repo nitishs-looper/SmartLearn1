@@ -11,7 +11,6 @@ public class Instructor : User, INotifiable
     {
         CreatedCourseIds = new List<int>();
     }
-    // Implement abstract members from User
     public override void DisplayDashboard()
     {
         Console.WriteLine("╔════════════════════════════════════════╗");
@@ -38,8 +37,6 @@ public class Instructor : User, INotifiable
         Console.WriteLine($"Department: {Department}");
         Console.WriteLine($"Courses Teaching: {CreatedCourseIds.Count}");
     }
-
-    // INotifiable implementation
     public void SendNotification(string message)
     {
         var entry = $"{DateTime.Now:g}: {message}";
@@ -100,7 +97,6 @@ public class Instructor : User, INotifiable
             Console.WriteLine("❌ Course not found!");
         }
     }
-    // Show course stats: title, number of enrolled students, average progress
     public void ShowMyCourses(List<Course> courses, List<Enrollment> enrollments)
     {
         if (CreatedCourseIds == null || CreatedCourseIds.Count == 0)
@@ -118,8 +114,6 @@ public class Instructor : User, INotifiable
         {
             var course = GetCourseById(courseId, courses);
             string title = course != null ? course.Title : $"(ID {courseId})";
-
-            // find enrollments for this course
             int count = 0;
             int sumProgress = 0;
             foreach (var e in enrollments)
@@ -127,7 +121,6 @@ public class Instructor : User, INotifiable
                 if (e.CourseId == courseId)
                 {
                     count++;
-                    // use exposed Progress property
                     try { sumProgress += e.Progress; } catch { }
                 }
             }

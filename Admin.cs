@@ -52,8 +52,6 @@ public class Admin : User
         int totalCourses = courses.Count;
         Console.WriteLine($"Total Users: {totalUsers}");
         Console.WriteLine($"Total Courses: {totalCourses}");
-
-        // Students who have completed all their enrolled courses (100% on each)
         int studentsWithFullCompletion = 0;
         foreach (var user in users)
         {
@@ -75,8 +73,6 @@ public class Admin : User
             if (hasEnrollment && allCompleted) studentsWithFullCompletion++;
         }
         Console.WriteLine($"Students with 100% completion (for all enrolled courses): {studentsWithFullCompletion}");
-
-        // Course popularity counts (include courses with zero enrollments)
         var courseCounts = new Dictionary<int, int>();
         foreach (var c in courses)
             courseCounts[c.CourseId] = 0;
@@ -85,8 +81,6 @@ public class Admin : User
             if (courseCounts.ContainsKey(e.CourseId))
                 courseCounts[e.CourseId]++;
         }
-
-        // Determine most and least popular
         int mostPopularId = -1, leastPopularId = -1;
         int mostCount = -1, leastCount = int.MaxValue;
         foreach (var kv in courseCounts)
@@ -112,8 +106,6 @@ public class Admin : User
         }
         Console.WriteLine($"Most popular course: {mostTitle} ({mostCount} enrollments)");
         Console.WriteLine($"Least popular course: {leastTitle} ({leastCount} enrollments)");
-
-        // Inactive users count
         int inactiveUsers = 0;
         foreach (var u in users)
         {

@@ -1,4 +1,4 @@
-﻿// Interface for enrollable entities (courses)
+﻿
 public interface IEnrollable
 {
     void Enroll(Student student);

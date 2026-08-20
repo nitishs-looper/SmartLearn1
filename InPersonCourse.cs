@@ -4,7 +4,6 @@ namespace SmartLearn1
 {
     public class InPersonCourse : Course
     {
-        // Use MaxStudents property from base Course (validation centralized)
 
         public string RoomNumber { get; set; }
         public string Building { get; set; }

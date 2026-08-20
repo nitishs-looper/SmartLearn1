@@ -53,14 +53,12 @@ namespace SmartLearn1
             CurrentEnrollments = 0;
             Category = category;
         }
-
-        // Abstract members that derived classes must implement
         public abstract bool CanEnroll(Student student);
         public abstract void DisplayCourseInfo();
         public abstract string GetCourseType();
         public abstract int GetAvailableSeats();
 
-        // IEnrollable implementation
+      
         void IEnrollable.Enroll(Student student)
         {
             if (!CanEnroll(student))
@@ -93,7 +91,7 @@ namespace SmartLearn1
 
         bool IEnrollable.CanEnroll(Student student)
         {
-            // Defer to derived implementation
+           
             return CanEnroll(student);
         }
 
@@ -102,7 +100,7 @@ namespace SmartLearn1
             return GetAvailableSeats();
         }
 
-        // ISearchable implementation
+       
         public bool MatchesSearch(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword)) return false;
@@ -118,7 +116,7 @@ namespace SmartLearn1
             return $"[{GetCourseType()}] {Title} - {Category} (Instructor: {InstructorName})";
         }
 
-        // IRatable implementation
+       
         public void AddRating(int stars, string review)
         {
             if (stars < 1 || stars > 5)

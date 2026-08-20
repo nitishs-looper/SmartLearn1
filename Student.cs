@@ -152,8 +152,6 @@ public class Student : User, ISearchable, INotifiable
     {
         return $"[Student] {Username} ({Email}) - {EnrolledCourseIds.Count} courses";
     }
-
-    // INotifiable implementation
     public void SendNotification(string message)
     {
         var entry = $"{DateTime.Now:g}: {message}";

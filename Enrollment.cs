@@ -15,7 +15,7 @@ namespace SmartLearn1
 
         public string Username { get; internal set; }
 
-        // Expose progress so other classes can calculate statistics
+     
         public int Progress => ProgressPercentage;
 
         public Enrollment(int enrollmentId, String studentUsername, int courseId)

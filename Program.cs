@@ -152,7 +152,6 @@ class Program
         }
         currentUsername = username;
         currentUser.DisplayDashboard();
-        // After displaying dashboard, delegate interactive handling to role-specific handlers
         if (currentUser is Student s)
         {
             HandleStudentDashboard(s);
@@ -172,8 +171,6 @@ class Program
         currentUser = null;
         Console.WriteLine("You have been logged out successfully.");
     }
-
-    // Role-specific interactive handlers
     public static void HandleStudentDashboard(Student studentObj)
     {
         while (true)
@@ -233,7 +230,6 @@ class Program
                     instructorObj.ShowMyCourses(courses, enrollments);
                     break;
                 case "2":
-                    // Create minimal course entry
                     int newId = courses.Count > 0 ? courses[^1].CourseId + 1 : 1;
                     Console.WriteLine("Enter course title:");
                     var title = Console.ReadLine();

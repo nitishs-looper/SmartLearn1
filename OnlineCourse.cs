@@ -16,7 +16,6 @@ namespace SmartLearn1
 
         public override bool CanEnroll(Student student)
         {
-            // Online courses are assumed to have unlimited capacity
             return true;
         }
 

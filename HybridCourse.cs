@@ -5,7 +5,6 @@ namespace SmartLearn1
 {
     public class HybridCourse : Course
     {
-        // Use MaxStudents property from base Course (validation centralized)
 
         public int OnlineVideoDuration { get; set; }
         public string RoomNumber { get; set; }
