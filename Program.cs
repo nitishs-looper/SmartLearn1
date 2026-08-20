@@ -151,8 +151,20 @@ class Program
             Console.WriteLine("Incorrect password. Please try again.");
         }
         currentUsername = username;
-        // Use polymorphism: call the dashboard on the actual user instance
         currentUser.DisplayDashboard();
+        // After displaying dashboard, delegate interactive handling to role-specific handlers
+        if (currentUser is Student s)
+        {
+            HandleStudentDashboard(s);
+        }
+        else if (currentUser is Instructor ins)
+        {
+            HandleInstructorDashboard(ins);
+        }
+        else if (currentUser is Admin adm)
+        {
+            HandleAdminDashboard(adm);
+        }
     }
     static void Logout()
     {
@@ -160,36 +172,176 @@ class Program
         currentUser = null;
         Console.WriteLine("You have been logged out successfully.");
     }
+
+    // Role-specific interactive handlers
+    public static void HandleStudentDashboard(Student studentObj)
+    {
+        while (true)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Enter choice (1-5):");
+            var choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    BrowseAndEnrollCourses();
+                    break;
+                case "2":
+                    ShowMyEnrolledCourses();
+                    break;
+                case "3":
+                    Console.WriteLine("Enter Course ID to update progress:");
+                    if (!int.TryParse(Console.ReadLine(), out int cid)) { Console.WriteLine("Invalid ID"); break; }
+                    Console.WriteLine("Enter new progress percentage (0-100):");
+                    if (!int.TryParse(Console.ReadLine(), out int pct) || pct < 0 || pct > 100) { Console.WriteLine("Invalid percentage"); break; }
+                    var enr = enrollments.Find(e => e.Username == studentObj.Username && e.CourseId == cid);
+                    if (enr != null)
+                    {
+                        enr.updateProgress(pct);
+                        if (studentObj.CourseProgress == null) studentObj.CourseProgress = new Dictionary<int, int>();
+                        studentObj.CourseProgress[cid] = pct;
+                        Console.WriteLine("✓ Progress updated");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not enrolled in this course.");
+                    }
+                    break;
+                case "4":
+                    studentObj.DisplayInfo();
+                    break;
+                case "5":
+                    Logout();
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
+    }
+
+    public static void HandleInstructorDashboard(Instructor instructorObj)
+    {
+        while (true)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Enter choice (1-5):");
+            var choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    instructorObj.ShowMyCourses(courses, enrollments);
+                    break;
+                case "2":
+                    // Create minimal course entry
+                    int newId = courses.Count > 0 ? courses[^1].CourseId + 1 : 1;
+                    Console.WriteLine("Enter course title:");
+                    var title = Console.ReadLine();
+                    Console.WriteLine("Enter course description:");
+                    var desc = Console.ReadLine();
+                    var newCourse = new StandardCourse(newId, title ?? "Untitled", desc ?? "", instructorObj.Username, 10, "General");
+                    courses.Add(newCourse);
+                    instructorObj.AddCourse(newId);
+                    Console.WriteLine($"✓ Course '{title}' created with ID {newId}");
+                    break;
+                case "3":
+                    Console.WriteLine("Enter Course ID to view roster:");
+                    if (!int.TryParse(Console.ReadLine(), out int cid)) { Console.WriteLine("Invalid ID"); break; }
+                    Console.WriteLine($"Students enrolled in course {cid}:");
+                    foreach (var e in enrollments)
+                    {
+                        if (e.CourseId == cid) Console.WriteLine($"- {e.Username} (Progress: {e.Progress}%)");
+                    }
+                    break;
+                case "4":
+                    Console.WriteLine("Enter Course ID to grade:");
+                    if (!int.TryParse(Console.ReadLine(), out int gcid)) { Console.WriteLine("Invalid ID"); break; }
+                    Console.WriteLine("Enter student username:");
+                    var uname = Console.ReadLine();
+                    var enr = enrollments.Find(e => e.CourseId == gcid && e.Username == uname);
+                    if (enr == null) { Console.WriteLine("Enrollment not found"); break; }
+                    Console.WriteLine("Enter grade/progress percent (0-100):");
+                    if (!int.TryParse(Console.ReadLine(), out int grade) || grade < 0 || grade > 100) { Console.WriteLine("Invalid grade"); break; }
+                    enr.updateProgress(grade);
+                    Console.WriteLine("✓ Graded/Progress updated");
+                    break;
+                case "5":
+                    Logout();
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
+    }
+
+    public static void HandleAdminDashboard(Admin adminObj)
+    {
+        while (true)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Enter choice (1-5):");
+            var choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    adminObj.ViewAllUsers(users);
+                    Console.WriteLine("Enter username to deactivate (or blank to cancel):");
+                    var toDeact = Console.ReadLine();
+                    if (!string.IsNullOrWhiteSpace(toDeact))
+                    {
+                        var u = users.Find(x => x.Username == toDeact);
+                        if (u != null) adminObj.DeactivateUser(u);
+                        else Console.WriteLine("User not found");
+                    }
+                    break;
+                case "2":
+                    Console.WriteLine("Courses:");
+                    foreach (var c in courses) Console.WriteLine($"{c.CourseId}: {c.Title}");
+                    Console.WriteLine("Enter Course ID to remove (or blank to cancel):");
+                    var input = Console.ReadLine();
+                    if (int.TryParse(input, out int rid))
+                    {
+                        var course = courses.Find(c => c.CourseId == rid);
+                        if (course != null) { courses.Remove(course); Console.WriteLine("✓ Course removed"); }
+                        else Console.WriteLine("Course not found");
+                    }
+                    break;
+                case "3":
+                    adminObj.GetSystemStats(users, courses, enrollments);
+                    break;
+                case "4":
+                    adminObj.DisplayPermissions();
+                    break;
+                case "5":
+                    Logout();
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
+    }
     static void LoadSampleCourses()
     {
         // Initialize the more extensive sample set
         InitializeCourses();
         Console.WriteLine("✓ Sample courses loaded successfully!");
     }
-
-    // InitializeCourses: populate the courses list with at least 10 sample courses
     static void InitializeCourses()
     {
         courses.Clear();
-
-        // 5 Online Courses (IDs 101-105)
         courses.Add(new OnlineCourse(101, "C# Fundamentals", "Learn C# fundamentals from variables to OOP.", "Prof. Smith", 450, "Programming"));
         courses.Add(new OnlineCourse(102, "Python for Beginners", "A gentle introduction to Python programming.", "Prof. Johnson", 360, "Programming"));
         courses.Add(new OnlineCourse(103, "Web Development Basics", "HTML, CSS and JavaScript for beginners.", "Prof. Williams", 540, "Web Development"));
         courses.Add(new OnlineCourse(104, "Data Structures", "Core data structures and algorithms in practice.", "Prof. Brown", 600, "Programming"));
         courses.Add(new OnlineCourse(105, "Machine Learning Intro", "Introductory machine learning concepts and workflows.", "Prof. Davis", 720, "Data Science"));
-
-        // 3 In-Person Courses (IDs 201-203)
         courses.Add(new InPersonCourse(201, "Database Design Workshop", "Design relational databases and ER modelling.", "Prof. Taylor", 25, "B-101", "Engineering Building", "Database"));
         courses.Add(new InPersonCourse(202, "Network Security Lab", "Hands-on network security lab sessions.", "Prof. Anderson", 20, "C-205", "CS Building", "Security"));
         courses.Add(new InPersonCourse(203, "Mobile App Development", "In-person mobile app labs and pair programming.", "Prof. Martinez", 30, "A-301", "Tech Center", "Mobile Development"));
-
-        // 2 Hybrid Courses (IDs 301-302)
         courses.Add(new HybridCourse(301, "Full-Stack Development", "Combination of online content and in-person workshops.", "Prof. Clark", 30, 720, "C-201", "CS Building", "Web Development"));
         courses.Add(new HybridCourse(302, "Cloud Computing", "Cloud fundamentals with online labs and on-campus sessions.", "Prof. Lewis", 25, 600, "D-101", "Engineering Building", "Cloud"));
     }
-
-    // UniversalSearch: search across courses and searchable users (e.g., students)
     static void UniversalSearch(List<Course> courseList, List<User> userList)
     {
         var combined = new List<ISearchable>();
@@ -475,9 +627,7 @@ class Program
             }
         }
     }
-    // previous role-specific dashboard methods removed in favor of polymorphic DisplayDashboard on User
-    // instructor dashboard removed; Instructor.DisplayDashboard provides presentation
-    // admin dashboard removed; Admin.DisplayDashboard provides presentation
+
     public static void exit()
     {
         Console.WriteLine("Thx for using our application!!!");

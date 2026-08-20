@@ -50,8 +50,8 @@ public abstract class User
         Password = password;
         Email = email;
         Role = role;
-        isactive = true; // New accounts are active by default
-        DateRegistered = DateTime.Now; // Set to current date/time
+        isactive = true; 
+        DateRegistered = DateTime.Now;
     }
     public virtual void DisplayInfo()
     {
@@ -60,8 +60,6 @@ public abstract class User
         Console.WriteLine("Account Status: " + (isactive ? "Active" : "Inactive"));
         Console.WriteLine("Date Registered: " + DateRegistered.ToString("g"));
     }
-    //public abstract void DisplayDashboard();
-    //public abstract string GetUserType();
     public virtual void DisplayInfoWithRole()
     {
         Console.WriteLine($"Username: {Username}");
@@ -70,8 +68,6 @@ public abstract class User
         Console.WriteLine("Account Status: " + (isactive ? "Active" : "Inactive"));
         Console.WriteLine("Date Registered: " + DateRegistered.ToString("g"));
     }
-
-    // Abstract members that derived classes must implement
     public abstract void DisplayDashboard();
     public abstract string GetUserType();
     public bool ValidatePassword(string inputPassword)
@@ -95,7 +91,5 @@ public abstract class User
         isactive = true;
         Console.WriteLine("Account activated.");
     }
-
-    // Expose account active state for administrative checks
     public bool IsActive => isactive;
 }

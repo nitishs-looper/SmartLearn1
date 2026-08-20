@@ -60,8 +60,6 @@ public class Student : User, ISearchable, INotifiable
         EnrolledCourseIds = new List<int>();
         CourseProgress = new Dictionary<int, int>();
     }
-
-    // Implement abstract members from User
     public override void DisplayDashboard()
     {
         Console.WriteLine("╔════════════════════════════════════════╗");
@@ -142,8 +140,6 @@ public class Student : User, ISearchable, INotifiable
             Console.WriteLine("⚠️ Warning: Your progress is below 50% after 30 days. Consider seeking help or adjusting your study plan.");
         }
     }
-
-    // ISearchable implementation
     public bool MatchesSearch(string keyword)
     {
         if (string.IsNullOrWhiteSpace(keyword)) return false;
