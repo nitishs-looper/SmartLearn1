@@ -320,7 +320,6 @@ class Program
     }
     static void LoadSampleCourses()
     {
-        // Initialize the more extensive sample set
         InitializeCourses();
         Console.WriteLine("✓ Sample courses loaded successfully!");
     }
@@ -581,14 +580,10 @@ class Program
             Console.WriteLine("✗ Full or not eligible to enroll in this course.");
             return;
         }
-
-        // Enroll via the IEnrollable implementation (polymorphic behavior)
         ((IEnrollable)selectedCourse).Enroll(studentObj);
         int enrollmentId = enrollments.Count + 1;
         Enrollment newEnrollment = new Enrollment(enrollmentId, studentObj.Username, selectedId);
         enrollments.Add(newEnrollment);
-
-        // Notify instructor if they implement INotifiable
         var instructorNotify = users.Find(u => u.Username == selectedCourse.InstructorName) as INotifiable;
         if (instructorNotify != null)
         {

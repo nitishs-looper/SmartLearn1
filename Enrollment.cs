@@ -22,6 +22,8 @@ namespace SmartLearn1
         {
             EnrollmentId = enrollmentId;
             StudentUsername = studentUsername;
+            // Keep the public Username property in sync so lookups by Username work
+            Username = studentUsername;
             CourseId = courseId;
             EnrollmentDate = DateTime.Now;
             ProgressPercentage = 0;
