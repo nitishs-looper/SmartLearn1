@@ -287,7 +287,11 @@ class Program
                     if (!string.IsNullOrWhiteSpace(toDeact))
                     {
                         var u = users.Find(x => x.Username == toDeact);
-                        if (u != null) adminObj.DeactivateUser(u);
+                        if (u != null)
+                        {
+                            // Delete the user (remove from users list and associated enrollments)
+                            adminObj.DeleteUser(users, enrollments, u);
+                        }
                         else Console.WriteLine("User not found");
                     }
                     break;
@@ -523,10 +527,11 @@ class Program
         }
         if (userToDeactivate == currentUser) 
         { 
-            Console.WriteLine(" You cannot deactivate yourself!");
+            Console.WriteLine(" You cannot delete yourself!");
             return; 
         }
-        admin.DeactivateUser(userToDeactivate);
+        // Delete the user and their enrollments
+        admin.DeleteUser(users, enrollments, userToDeactivate);
     }
     static void BrowseAndEnrollCourses()
     {

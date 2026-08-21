@@ -46,6 +46,30 @@ public class Admin : User
         user.DeactivateAccount();
         Console.WriteLine($"User {user.Username} has been deactivated.");
     }
+    // Deletes a user from the users list and removes their enrollments
+    public void DeleteUser(List<User> users, List<SmartLearn1.Enrollment> enrollments, User user)
+    {
+        if (user == null)
+        {
+            Console.WriteLine("No user specified.");
+            return;
+        }
+        // Attempt to remove user from the list
+        bool removed = users.Remove(user);
+        if (removed)
+        {
+            // Remove any enrollments for this user
+            if (enrollments != null)
+            {
+                enrollments.RemoveAll(e => e.Username == user.Username || e.StudentUsername == user.Username);
+            }
+            Console.WriteLine($"User {user.Username} has been deleted and their enrollments were removed.");
+        }
+        else
+        {
+            Console.WriteLine($"Failed to delete user {user.Username}. User may not exist in the list.");
+        }
+    }
     public void GetSystemStats(List<User> users, List<Course> courses, List<Enrollment> enrollments)
     {
         int totalUsers = users.Count;
